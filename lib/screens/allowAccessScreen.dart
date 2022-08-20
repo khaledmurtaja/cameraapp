@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-import 'cameraApp.dart';
+import '../cameraApp.dart';
 
 class AllowAccessScreen extends StatelessWidget {
   const AllowAccessScreen({Key? key}) : super(key: key);

@@ -1,19 +1,19 @@
 import 'dart:async';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:camera/camera.dart';
-import 'package:cameraapp/Drawer.dart';
-import 'package:cameraapp/FlagModel.dart';
-import 'package:cameraapp/globalVars.dart';
+import 'package:cameraapp/screens/Drawer.dart';
+import 'package:cameraapp/models/FlagModel.dart';
+import 'package:cameraapp/shared/globalVars.dart';
 import 'package:cameraapp/main.dart';
-import 'package:cameraapp/videoModel.dart';
+import 'package:cameraapp/models/videoModel.dart';
 // import 'package:ffmpeg_kit_flutter/ffmpeg_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:lifecycle/lifecycle.dart';
 import 'package:path_provider/path_provider.dart';
-import 'HelperFunctions.dart';
+import 'shared/HelperFunctions.dart';
 import 'dart:io';
-import 'cameraGallary.dart';
+import 'screens/cameraGallary.dart';
 import 'package:stop_watch_timer/stop_watch_timer.dart';
 
 class CustomCamera extends StatefulWidget {

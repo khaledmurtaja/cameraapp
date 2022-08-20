@@ -1,16 +1,18 @@
 import 'dart:io';
 
 import 'package:camera/camera.dart';
-import 'package:cameraapp/HelperFunctions.dart';
-import 'package:cameraapp/globalVars.dart';
-import 'package:cameraapp/videoModel.dart';
+import 'package:cameraapp/shared/HelperFunctions.dart';
+import 'package:cameraapp/shared/globalVars.dart';
+import 'package:cameraapp/models/videoModel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hive/hive.dart';
 import 'package:lifecycle/lifecycle.dart';
 import 'package:path_provider/path_provider.dart';
-import 'FlagModel.dart';
-import 'allowAccessScreen.dart';
+import 'models/FlagModel.dart';
+import 'models/FlagModel.dart';
+import 'models/videoModel.dart';
+import 'screens/allowAccessScreen.dart';
 import 'cameraApp.dart';
 
 List<CameraDescription>? MyAvailableCameras;

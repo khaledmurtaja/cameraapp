@@ -1,10 +1,10 @@
 import 'dart:async';
 import 'dart:typed_data';
 
-import 'package:cameraapp/videoModel.dart';
+import 'package:cameraapp/models/videoModel.dart';
 import 'package:hive/hive.dart';
 
-import 'FlagModel.dart';
+import '../models/FlagModel.dart';
 
 bool permissionsGranted=false;
 final int VideoMode=1;

@@ -6,6 +6,7 @@ part of 'videoModel.dart';
 // TypeAdapterGenerator
 // **************************************************************************
 
+
 class videoModelAdapter extends TypeAdapter<VideoModel> {
   @override
   final int typeId = 0;

@@ -1,5 +1,5 @@
 
-import 'package:cameraapp/FlagModel.dart';
+import 'package:cameraapp/models/FlagModel.dart';
 import 'package:hive/hive.dart';
 part 'videoModel.g.dart';
 @HiveType( typeId : 0,adapterName: "videoModelAdapter")

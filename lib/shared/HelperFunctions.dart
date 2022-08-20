@@ -2,11 +2,13 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:ui';
 import 'package:camera/camera.dart';
-import 'package:cameraapp/globalVars.dart';
-import 'package:cameraapp/videoModel.dart';
+import 'package:cameraapp/shared/globalVars.dart';
+import 'package:cameraapp/models/videoModel.dart';
 import 'package:external_path/external_path.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:permission_handler/permission_handler.dart';
+
+import '../models/videoModel.dart';
 
 Future<String> getFilePath() async {
   // this function return the file path that we save images &videos to it

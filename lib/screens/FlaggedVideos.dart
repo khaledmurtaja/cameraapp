@@ -1,8 +1,9 @@
-import 'package:cameraapp/videoModel.dart';
+import 'package:cameraapp/models/videoModel.dart';
 import 'package:cameraapp/videoPlayer.dart';
 import 'package:flutter/material.dart';
-import 'package:hive_flutter/hive_flutter.dart';import 'globalVars.dart';
-import 'videoModel.dart';
+import 'package:hive_flutter/hive_flutter.dart';import '../models/videoModel.dart';
+import '../shared/globalVars.dart';
+import '../models/videoModel.dart';
 class FlaggedVideos extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
