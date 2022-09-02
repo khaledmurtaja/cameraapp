@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:camera/camera.dart';
 import 'package:cameraapp/shared/globalVars.dart';
 import 'package:cameraapp/models/videoModel.dart';
+import 'package:cameraapp/shared/videoInfo.dart';
 import 'package:external_path/external_path.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -57,8 +58,10 @@ Timer recordingTimer(
     required Function function}) {
   return Timer.periodic(Duration(seconds: duration), (timer) {
     if (cameraController!.value.isRecordingVideo) {
-      cameraController.stopVideoRecording().then((value) {
-        VideoModel videoModel = VideoModel(value.path.toString(),isFlagged: isFlagged,flagsModels: Flags);
+      cameraController.stopVideoRecording().then((video) async {
+        var info=await videoInfo.getVideoInfoInstance()!.getVideoInfo(video.path);
+        int duration=info!.duration!~/1000;
+        VideoModel videoModel = VideoModel(video.path.toString(),isFlagged: isFlagged,flagsModels: Flags,videoDuration: duration);
         videoClips.add(videoModel);
         if(videoModel.isFlagged){
           box!.add(videoModel);
@@ -80,8 +83,10 @@ Timer recordingTimer(
           durationTimer =
               Timer.periodic(Duration(seconds:fileDurationInSec), (timer) {
             if (cameraController.value.isRecordingVideo) {
-              cameraController.stopVideoRecording().then((value) {
-                VideoModel videoModel = VideoModel(value.path.toString(),isFlagged: isFlagged,flagsModels: Flags);
+              cameraController.stopVideoRecording().then((video) async {
+                var info=await videoInfo.getVideoInfoInstance()!.getVideoInfo(video.path);
+                int duration=info!.duration!~/1000;
+                VideoModel videoModel = VideoModel(video.path.toString(),isFlagged: isFlagged,flagsModels: Flags,videoDuration: duration);
                 videoClips.add(videoModel);
                 if(videoModel.isFlagged){
                   box!.add(videoModel);

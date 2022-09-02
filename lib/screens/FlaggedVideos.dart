@@ -1,10 +1,12 @@
 import 'package:cameraapp/models/videoModel.dart';
 import 'package:cameraapp/videoPlayer.dart';
 import 'package:flutter/material.dart';
-import 'package:hive_flutter/hive_flutter.dart';import '../models/videoModel.dart';
-import '../shared/globalVars.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:video_trimmer/src/videoFlag.dart';
 import '../models/videoModel.dart';
+import '../shared/globalVars.dart';
 class FlaggedVideos extends StatelessWidget {
+  List<VideoFlag> videoFlags=[];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -31,11 +33,14 @@ class FlaggedVideos extends StatelessWidget {
   }
 
   Widget itemBuilder(int key,Box<VideoModel> box,context) {
+    box.get(key)!.flagsModels.forEach((element) {
+      videoFlags.add(VideoFlag(flagPoint: element.flagPoint,afterFlag: 10,BeforeFlag: 5));
+    });
     int index=box.get(key)!.path!.lastIndexOf("/");
     String path=box.get(key)!.path!.substring(index+1,box.get(key)!.path!.length);
     return InkWell(
       onTap: (){
-        Navigator.push(context, MaterialPageRoute(builder: (context)=>CustomTrimmer(path: box.get(key)!.path,)));
+        Navigator.push(context, MaterialPageRoute(builder: (context)=>CustomTrimmer(path: box.get(key)!.path,videoFlagList: videoFlags,)));
 
       },
       child: Padding(

@@ -6,7 +6,6 @@ part of 'videoModel.dart';
 // TypeAdapterGenerator
 // **************************************************************************
 
-
 class videoModelAdapter extends TypeAdapter<VideoModel> {
   @override
   final int typeId = 0;
@@ -20,19 +19,22 @@ class videoModelAdapter extends TypeAdapter<VideoModel> {
     return VideoModel(
       fields[1] as String?,
       isFlagged: fields[2] as bool,
-      flagsModels: (fields[3] as List).cast<FlagModel>(),
+      flagsModels: (fields[4] as List).cast<FlagModel>(),
+      videoDuration: fields[3] as int?,
     );
   }
 
   @override
   void write(BinaryWriter writer, VideoModel obj) {
     writer
-      ..writeByte(3)
+      ..writeByte(4)
       ..writeByte(1)
       ..write(obj.path)
       ..writeByte(2)
       ..write(obj.isFlagged)
       ..writeByte(3)
+      ..write(obj.videoDuration)
+      ..writeByte(4)
       ..write(obj.flagsModels);
   }
 

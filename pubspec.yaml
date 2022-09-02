@@ -29,13 +29,13 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  video_trimmer:
+   git:
+     url: https://github.com/khaledmurtaja/video_trimmer
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
   camera: ^0.9.8+1
-  video_trimmer:
-    git:
-      url: https://github.com/khaledmurtaja/video_trimmer.git
   permission_handler: ^10.0.0
   external_path: ^1.0.1
   audioplayers: ^1.0.1
@@ -48,6 +48,7 @@ dependencies:
   hive: ^2.2.3
   hive_flutter: ^1.1.0
   file_picker: ^5.0.0
+  flutter_video_info: ^1.2.0
 
 
 dev_dependencies:

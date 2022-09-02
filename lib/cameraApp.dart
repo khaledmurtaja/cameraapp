@@ -6,8 +6,10 @@ import 'package:cameraapp/models/FlagModel.dart';
 import 'package:cameraapp/shared/globalVars.dart';
 import 'package:cameraapp/main.dart';
 import 'package:cameraapp/models/videoModel.dart';
+import 'package:cameraapp/shared/videoInfo.dart';
 // import 'package:ffmpeg_kit_flutter/ffmpeg_kit.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_video_info/flutter_video_info.dart';
 import 'package:hive/hive.dart';
 import 'package:lifecycle/lifecycle.dart';
 import 'package:path_provider/path_provider.dart';
@@ -563,7 +565,12 @@ class _CustomCameraState extends State<CustomCamera>
                                   cameraController!
                                       .stopVideoRecording()
                                       .then((video) async {
-                                    VideoModel videoModel=VideoModel(video.path,isFlagged: isFlagged,flagsModels:Flags );
+                                    var info=await videoInfo.getVideoInfoInstance()!.getVideoInfo(video.path);
+                                    int duration=info!.duration!~/1000;
+                                    print("sdflisldfsiuldj");
+                                    print(duration);
+                                    print("sdflisldfsiuldj");
+                                    VideoModel videoModel=VideoModel(video.path,isFlagged: isFlagged,flagsModels:Flags,videoDuration: duration );
                                     Flags=[];
                                     if(videoModel.isFlagged){
                                       box!.add(videoModel);

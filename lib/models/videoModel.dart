@@ -9,6 +9,8 @@ class VideoModel{
   @HiveField(2)
   bool isFlagged=false;
   @HiveField(3)
+  int? videoDuration;
+  @HiveField(4)
   List<FlagModel> flagsModels=[];
-  VideoModel(this.path, {required this.isFlagged,required this.flagsModels});
+  VideoModel(this.path, {required this.isFlagged,required this.flagsModels,required this.videoDuration});
 }
