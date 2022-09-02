@@ -7,16 +7,14 @@ import 'package:cameraapp/shared/globalVars.dart';
 import 'package:cameraapp/main.dart';
 import 'package:cameraapp/models/videoModel.dart';
 import 'package:cameraapp/shared/videoInfo.dart';
-// import 'package:ffmpeg_kit_flutter/ffmpeg_kit.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_video_info/flutter_video_info.dart';
-import 'package:hive/hive.dart';
 import 'package:lifecycle/lifecycle.dart';
 import 'package:path_provider/path_provider.dart';
 import 'shared/HelperFunctions.dart';
 import 'dart:io';
 import 'screens/cameraGallary.dart';
 import 'package:stop_watch_timer/stop_watch_timer.dart';
+import 'package:dio/dio.dart';
 
 class CustomCamera extends StatefulWidget {
   @override
@@ -53,7 +51,9 @@ class _CustomCameraState extends State<CustomCamera>
   final resolutionPresets = ResolutionPreset.values;
   bool fullyZoomed = false;
   bool isPaused = false;
-  bool systemStopRecording=false; /// to check if the system stop recording due to specified internal ending(not by user event)
+  bool systemStopRecording = false;
+
+  /// to check if the system stop recording due to specified internal ending(not by user event)
 
   /// to check if the user tapped the screen double tab=>set max zoom :another doulbe tap=>set min zoom
   ResolutionPreset currentResolutionPreset = ResolutionPreset.max;
@@ -70,9 +70,11 @@ class _CustomCameraState extends State<CustomCamera>
   String durationSelectorText = "1";
   XFile? fileToDelete;
   XFile? fileToSave;
-  bool isProcessingVideo=false; // this will be true when the video interval ends(system stop)
-  Timer? processingTimer;// this the timer that will stop user events before starting the (system stop);
-  int remainingTime=0;
+  bool isProcessingVideo =
+      false; // this will be true when the video interval ends(system stop)
+  Timer?
+      processingTimer; // this the timer that will stop user events before starting the (system stop);
+  int remainingTime = 0;
 
   /// when this is true=> a list will be shown in the app bar, the user
   ///can choose form it the number of minutes to save in a video clip operation
@@ -469,9 +471,10 @@ class _CustomCameraState extends State<CustomCamera>
                                   cameraController!
                                       .pauseVideoRecording()
                                       .then((value) {
-                                        durationTimer!.cancel();
-                                        processingTimer!.cancel();
-                                        remainingTime=fileDurationInSec-customProcessingTimer;
+                                    durationTimer!.cancel();
+                                    processingTimer!.cancel();
+                                    remainingTime = fileDurationInSec -
+                                        customProcessingTimer;
                                     isPaused = !isPaused;
                                     _stopWatchTimer!.onExecute
                                         .add(StopWatchExecute.stop);
@@ -482,18 +485,18 @@ class _CustomCameraState extends State<CustomCamera>
                                   cameraController!
                                       .resumeVideoRecording()
                                       .then((value) {
-                                    durationTimer=recordingTimer(
-                                        duration:remainingTime,
+                                    durationTimer = recordingTimer(
+                                        duration: remainingTime,
                                         cameraController: cameraController,
                                         IsRecording: IsRecording,
                                         videoClips: videoClips,
-                                        function:  (){
-                                          setState((){});
-                                        }
-                                    );
-                                    processingTimer=Timer.periodic(Duration(seconds: 1), (timer) {
+                                        function: () {
+                                          setState(() {});
+                                        });
+                                    processingTimer = Timer.periodic(
+                                        Duration(seconds: 1), (timer) {
                                       print(customProcessingTimer);
-                                      if(IsRecording&&!isPaused) {
+                                      if (IsRecording && !isPaused) {
                                         customProcessingTimer += 1;
                                         setState(() {});
                                       }
@@ -512,13 +515,16 @@ class _CustomCameraState extends State<CustomCamera>
                         padding: const EdgeInsets.only(left: 100, right: 100),
                         child: InkWell(
                           child: IsPictureMode
-                              ?  CircleAvatar(
+                              ? CircleAvatar(
                                   radius: 28,
-                                  backgroundColor:Colors.white,
+                                  backgroundColor: Colors.white,
                                 )
                               : CircleAvatar(
                                   radius: 28,
-                                  backgroundColor: customProcessingTimer<=(fileDurationInSec-3)?Colors.white:Colors.grey,
+                                  backgroundColor: customProcessingTimer <=
+                                          (fileDurationInSec - 3)
+                                      ? Colors.white
+                                      : Colors.grey,
                                   child: !IsRecording
                                       ? CircleAvatar(
                                           radius: 10,
@@ -529,110 +535,146 @@ class _CustomCameraState extends State<CustomCamera>
                                           height: 20,
                                           width: 20,
                                         )),
-                          onTap:customProcessingTimer<=fileDurationInSec-3? () async {
-                            print("$isProcessingVideo fsdsfd");
-                            if (flashOpened) {
-                              cameraController!.setFlashMode(FlashMode.torch);
-                            }
-                            if (IsPictureMode) {
-                              cameraController!
-                                  .takePicture()
-                                  .then((value) async {
-                                await player.play(AssetSource(
-                                    "audio/camera-shutter-sound.mp3"));
-                                cameraController!.setFlashMode(FlashMode.off);
-                                String path = await getFilePath();
-                                Directory d = Directory(path);
-                                value.saveTo("$path/${value.name}");
-                                Stream<FileSystemEntity> fileStream = d.list();
-                                fileStream.last.then((file) {
-                                  imagesPaths.add(file);
-                                  thumbNailPath = file.path;
-                                  setState(() {
-                                    isEmpty = false;
-                                  });
-                                });
-                                // to upgrade the thumbnail
-                              }).catchError((onError) {});
-                            } else {
-                              if (IsRecording&&cameraController!.value.isRecordingVideo) {
-                                // after stopping the record
-                                IsRecording = false;
-                                _stopWatchTimer!.onExecute
-                                    .add(StopWatchExecute.stop);
-                                if(customProcessingTimer<=fileDurationInSec-3) {
-                                  customProcessingTimer=0;
-                                  cameraController!
-                                      .stopVideoRecording()
-                                      .then((video) async {
-                                    var info=await videoInfo.getVideoInfoInstance()!.getVideoInfo(video.path);
-                                    int duration=info!.duration!~/1000;
-                                    print("sdflisldfsiuldj");
-                                    print(duration);
-                                    print("sdflisldfsiuldj");
-                                    VideoModel videoModel=VideoModel(video.path,isFlagged: isFlagged,flagsModels:Flags,videoDuration: duration );
-                                    Flags=[];
-                                    if(videoModel.isFlagged){
-                                      box!.add(videoModel);
-                                    }
-                                    cameraController!.setFlashMode(FlashMode.off);
-                                    videoClips.add(videoModel);
-                                        processingTimer!.cancel();
-                                    durationTimer!.cancel();
-                                    for(int modelIndex=0; modelIndex<videoClips.length; modelIndex++){
-                                      print(videoClips.elementAt(modelIndex).path);
-                                      File f=File(videoClips[modelIndex].path.toString());
-                                      String path=videoClips[modelIndex].path.toString();
-                                      int index=path.lastIndexOf("/");
-                                      f.copy("$AppExternalPath/${videoClips[modelIndex].path.toString().substring(index+1,path.length)}");
-                                      if(!isFlagged) {
-                                        File(path).delete();
-                                      }
-                                    }
-                                    isFlagged=false; //reset to initial value
-                                    videoClips=[];
-                                    // release the list of videos
-                                  }).catchError((onError) {
-                                    print("$onError");
-                                  });
-                                  setState(() {
-                                  });
-                                }// return to it
-                              } else {
-                                durationTimer=recordingTimer(
-                                  duration: fileDurationInSec+1,
-                                  cameraController: cameraController,
-                                  IsRecording: IsRecording,
-                                  videoClips: videoClips,
-                                  function: (){
-                                    setState((){
-                                      customProcessingTimer=0;
-                                    });
+                          onTap: customProcessingTimer <= fileDurationInSec - 3
+                              ? () async {
+                                  print("$isProcessingVideo fsdsfd");
+                                  if (flashOpened) {
+                                    cameraController!
+                                        .setFlashMode(FlashMode.torch);
                                   }
-                                );
-                                cameraController!
-                                    .startVideoRecording()
-                                    .then((value) async {
-                                  processingTimer=Timer.periodic(Duration(seconds: 1), (timer) {
-                                    if(IsRecording&&!isPaused) {
-                                      customProcessingTimer += 1;
-                                      print(customProcessingTimer);
-                                      setState(() {});
+                                  if (IsPictureMode) {
+                                    cameraController!
+                                        .takePicture()
+                                        .then((value) async {
+                                      await player.play(AssetSource(
+                                          "audio/camera-shutter-sound.mp3"));
+                                      cameraController!
+                                          .setFlashMode(FlashMode.off);
+                                      String path = await getFilePath();
+                                      Directory d = Directory(path);
+                                      value.saveTo("$path/${value.name}");
+                                      Stream<FileSystemEntity> fileStream =
+                                          d.list();
+                                      fileStream.last.then((file) {
+                                        imagesPaths.add(file);
+                                        thumbNailPath = file.path;
+                                        setState(() {
+                                          isEmpty = false;
+                                        });
+                                      });
+                                      // to upgrade the thumbnail
+                                    }).catchError((onError) {});
+                                  } else {
+                                    if (IsRecording &&
+                                        cameraController!
+                                            .value.isRecordingVideo) {
+                                      // after stopping the record
+                                      IsRecording = false;
+                                      _stopWatchTimer!.onExecute
+                                          .add(StopWatchExecute.stop);
+                                      if (customProcessingTimer <=
+                                          fileDurationInSec - 3) {
+                                        customProcessingTimer = 0;
+                                        cameraController!
+                                            .stopVideoRecording()
+                                            .then((video) async {
+                                          var info = await videoInfo
+                                              .getVideoInfoInstance()!
+                                              .getVideoInfo(video.path);
+                                          int duration =
+                                              info!.duration! ~/ 1000;
+                                          VideoModel videoModel = VideoModel(
+                                              video.path,
+                                              isFlagged: isFlagged,
+                                              flagsModels: Flags,
+                                              videoDuration: duration);
+                                          Flags = [];
+                                          if (videoModel.isFlagged) {
+                                            FlaggedVideoBox!.add(videoModel);
+                                            /// uploading to the server
+                                            // var formData=FormData.fromMap(
+                                            //   {
+                                            //     ""
+                                            //   }
+                                            // )
+                                            // MultipartFile.fromFile(videoModel.path.toString());
+                                            // var response=await Dio().post("http://91.232.125.244:8085/api/raw_videos",data: );
+
+                                          }
+                                          cameraController!
+                                              .setFlashMode(FlashMode.off);
+                                          videoClips.add(videoModel);
+                                          processingTimer!.cancel();
+                                          durationTimer!.cancel();
+                                          for (int modelIndex = 0;
+                                              modelIndex < videoClips.length;
+                                              modelIndex++) {
+                                            print(videoClips
+                                                .elementAt(modelIndex)
+                                                .path);
+                                            File f = File(videoClips[modelIndex]
+                                                .path
+                                                .toString());
+                                            String path = videoClips[modelIndex]
+                                                .path
+                                                .toString();
+                                            int index = path.lastIndexOf("/");
+                                            f.copy(
+                                                "$AppExternalPath/${videoClips[modelIndex].path.toString().substring(index + 1, path.length)}");
+                                            if (!isFlagged) {
+                                              File(path).delete();
+                                            }
+                                          }
+                                          isFlagged =
+                                              false; //reset to initial value
+                                          videoClips = [];
+                                          // release the list of videos
+                                        }).catchError((onError) {
+                                          print("$onError");
+                                        });
+                                        setState(() {});
+                                      } // return to it
+                                    } else {
+                                      durationTimer = recordingTimer(
+                                          duration: fileDurationInSec + 1,
+                                          cameraController: cameraController,
+                                          IsRecording: IsRecording,
+                                          videoClips: videoClips,
+                                          function: () {
+                                            setState(() {
+                                              customProcessingTimer = 0;
+                                            });
+                                          });
+                                      cameraController!
+                                          .startVideoRecording()
+                                          .then((value) async {
+                                        processingTimer = Timer.periodic(
+                                            Duration(seconds: 1), (timer) {
+                                          if (IsRecording && !isPaused) {
+                                            customProcessingTimer += 1;
+                                            print(customProcessingTimer);
+                                            setState(() {});
+                                          }
+                                        });
+                                        _stopWatchTimer = StopWatchTimer();
+                                        IsRecording = true;
+                                        _stopWatchTimer!.onExecute
+                                            .add(StopWatchExecute.start);
+                                        setState(() {});
+                                      }).catchError((onError) {
+                                        print(onError);
+                                      });
                                     }
-                                  });
-                                  _stopWatchTimer = StopWatchTimer();
-                                  IsRecording = true;
-                                  _stopWatchTimer!.onExecute
-                                      .add(StopWatchExecute.start);
-                                  setState(() {});
-                                }).catchError((onError) {
-                                  print(onError);
-                                });
-                              }
-                            }
-                          }:(){
-                            showCustomToast(msg: "wait for some seconds (camera is processing data)", textColor: Colors.black, fontSize: 17, backGroundColor: Colors.white);
-                          },
+                                  }
+                                }
+                              : () {
+                                  showCustomToast(
+                                      msg:
+                                          "wait for some seconds (camera is processing data)",
+                                      textColor: Colors.black,
+                                      fontSize: 17,
+                                      backGroundColor: Colors.white);
+                                },
                         ),
                       ),
                       !IsRecording
@@ -662,9 +704,12 @@ class _CustomCameraState extends State<CustomCamera>
                               ))
                           : InkWell(
                               onTap: () {
-                                isFlagged=true;
-                                flagPoint=customProcessingTimer;
-                                FlagModel model=FlagModel(beforeFlag: 5,afterFlag: 8,flagPoint: flagPoint);
+                                isFlagged = true;
+                                flagPoint = customProcessingTimer;
+                                FlagModel model = FlagModel(
+                                    beforeFlag: 5,
+                                    afterFlag: 10,
+                                    flagPoint: flagPoint);
                                 Flags.add(model);
                                 showCustomToast(
                                     msg:

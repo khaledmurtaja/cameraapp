@@ -9,6 +9,7 @@ import 'package:flutter/services.dart';
 import 'package:hive/hive.dart';
 import 'package:lifecycle/lifecycle.dart';
 import 'package:path_provider/path_provider.dart';
+import 'models/EditedVideoModel.dart';
 import 'models/FlagModel.dart';
 import 'models/FlagModel.dart';
 import 'models/videoModel.dart';
@@ -23,7 +24,9 @@ Future<void> main() async {
     ..init(directory.path);
   Hive.registerAdapter(videoModelAdapter());
   Hive.registerAdapter(flagAdapter());
-   box = await Hive.openBox<VideoModel>('flaggedVideos');
+  Hive.registerAdapter(EditedVideoModelAdapter());
+   FlaggedVideoBox = await Hive.openBox<VideoModel>('flaggedVideos');
+   EditedVideosBox=await Hive.openBox<EditedVideoModel>('editedVideos');
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
   MyAvailableCameras=await availableCameras();
   print(MyAvailableCameras!.length);

@@ -2,14 +2,15 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:ui';
 import 'package:camera/camera.dart';
+import 'package:cameraapp/models/FlagModel.dart';
 import 'package:cameraapp/shared/globalVars.dart';
 import 'package:cameraapp/models/videoModel.dart';
 import 'package:cameraapp/shared/videoInfo.dart';
 import 'package:external_path/external_path.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:permission_handler/permission_handler.dart';
-
 import '../models/videoModel.dart';
+import 'package:video_trimmer/src/videoFlag.dart';
 
 Future<String> getFilePath() async {
   // this function return the file path that we save images &videos to it
@@ -64,7 +65,7 @@ Timer recordingTimer(
         VideoModel videoModel = VideoModel(video.path.toString(),isFlagged: isFlagged,flagsModels: Flags,videoDuration: duration);
         videoClips.add(videoModel);
         if(videoModel.isFlagged){
-          box!.add(videoModel);
+          FlaggedVideoBox!.add(videoModel);
         }
         isFlagged=false;//set the flag to its initial value cause we have finished the recording operation
         Flags=[];
@@ -89,7 +90,7 @@ Timer recordingTimer(
                 VideoModel videoModel = VideoModel(video.path.toString(),isFlagged: isFlagged,flagsModels: Flags,videoDuration: duration);
                 videoClips.add(videoModel);
                 if(videoModel.isFlagged){
-                  box!.add(videoModel);
+                  FlaggedVideoBox!.add(videoModel);
                 }
                 isFlagged=false; //set the flag to its initial value cause we have finished the recording operation
                 Flags=[];
@@ -116,5 +117,25 @@ Timer recordingTimer(
       });
     }
   });
+}
+VideoFlag validateFlagPoint(VideoFlag flagModel, int? videoDuration) {
+  int startPoint =
+  (flagModel.flagPoint! - flagModel.BeforeFlag!).toInt();
+  int endPoint = (flagModel.flagPoint!+ flagModel.afterFlag!).toInt();
+  int duration =
+  videoDuration!; // convert to seconds instead of milliseconds
+  if (startPoint < 0) {
+    startPoint = 0;
+  }
+  if (endPoint > duration) {
+    endPoint = duration;
+  }
+
+
+
+  return VideoFlag(
+      flagPoint: flagModel.flagPoint,
+      afterFlag: endPoint,
+      BeforeFlag: startPoint);
 }
 

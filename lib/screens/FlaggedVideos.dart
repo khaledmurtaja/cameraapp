@@ -1,4 +1,5 @@
 import 'package:cameraapp/models/videoModel.dart';
+import 'package:cameraapp/screens/VideoTags.dart';
 import 'package:cameraapp/videoPlayer.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -7,6 +8,7 @@ import '../models/videoModel.dart';
 import '../shared/globalVars.dart';
 class FlaggedVideos extends StatelessWidget {
   List<VideoFlag> videoFlags=[];
+  List<List<VideoFlag>> videoFlagList=[];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -16,11 +18,12 @@ class FlaggedVideos extends StatelessWidget {
       body: ValueListenableBuilder(
         valueListenable: Hive.box<VideoModel>('flaggedVideos').listenable(),
         builder: (context, Box<VideoModel> items,Widget? widget ) {
-          List<int> keys= box!.keys.cast<int>().toList();
+          List<int> keys= FlaggedVideoBox!.keys.cast<int>().toList();
           return ListView.separated(
               shrinkWrap: true,
               itemBuilder: (context, index) {
-                return itemBuilder(index,box!,context);
+                videoFlags=[];
+                return itemBuilder(index,FlaggedVideoBox!,context);
               },
               separatorBuilder: (context, index) {
                 return separatorBuilder();
@@ -34,14 +37,15 @@ class FlaggedVideos extends StatelessWidget {
 
   Widget itemBuilder(int key,Box<VideoModel> box,context) {
     box.get(key)!.flagsModels.forEach((element) {
-      videoFlags.add(VideoFlag(flagPoint: element.flagPoint,afterFlag: 10,BeforeFlag: 5));
+      videoFlags.add(VideoFlag(flagPoint: element.flagPoint,afterFlag: element.afterFlag,BeforeFlag: element.beforeFlag));
     });
+    videoFlagList.add(videoFlags);
+
     int index=box.get(key)!.path!.lastIndexOf("/");
     String path=box.get(key)!.path!.substring(index+1,box.get(key)!.path!.length);
     return InkWell(
       onTap: (){
-        Navigator.push(context, MaterialPageRoute(builder: (context)=>CustomTrimmer(path: box.get(key)!.path,videoFlagList: videoFlags,)));
-
+        Navigator.push(context, MaterialPageRoute(builder: (context)=>VideoTags(list: videoFlagList.elementAt(key),path:box.get(key)!.path.toString(),videoDuration: box.get(key)!.videoDuration!.toInt(),)));
       },
       child: Padding(
         padding: const EdgeInsets.all(10.0),

@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:cameraapp/models/videoModel.dart';
 import 'package:hive/hive.dart';
 
+import '../models/EditedVideoModel.dart';
 import '../models/FlagModel.dart';
 
 bool permissionsGranted=false;
@@ -19,5 +20,6 @@ int fileDurationInSec = 60; //default value which could be change according to e
 bool isFlagged=false;
 int flagPoint=0;
 List<FlagModel> Flags=[];
-Box<VideoModel>? box;
+Box<VideoModel>? FlaggedVideoBox;
+Box<EditedVideoModel>? EditedVideosBox;
 Uint8List? uint8list;
